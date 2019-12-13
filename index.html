@@ -38,11 +38,14 @@
 
 
             <div class="col-md-3 navigation">
+                <br><br><br><br><br>
                 <div class="form-group">
                     <label for="exampleFormControlInput1"><i>Search for a City!</i></label>
-                    <input type="city" class="form-control" id="citySearch" placeholder="eg. Sydney">
+                    <input type="city" class="form-control" id="citySearch" placeholder="eg. Arizona">
                     <button type="submit" class="btn btn-info mt-1" id="searchBtn">Search</button>
+                    <button class="btn btn-info btn-city mt-1 mb-1" id="userLocate">My Location</button>
                 </div>
+                
                 <ul class="cityList">
 
                 </ul>
@@ -88,6 +91,19 @@
         $(".currentTime").text(currentDate);
         var userCity = "";
         var storedCity = localStorage.getItem('city');
+
+        $("#userLocate").on("click", function() {
+            fetch('https://extreme-ip-lookup.com/json/')
+            .then(res => res.json())
+            .then(response => {
+                userCity = response.city;
+                ajaxCall(userCity);
+                forecastCall(userCity);
+            })
+            .catch((data, status) => {
+                console.log('Request failed');
+            })
+        })
 
         if (storedCity) {
             var stored = localStorage.getItem("city");
@@ -205,10 +221,11 @@
             })
                 .then(function (response) {
                     var whatTime = [0, 8, 16, 24, 32]
-
+                    $(".5forecast").html("");
                     for (i = 0; i < whatTime.length; i++) {
+                        
                         var newContainingDiv = $("<div>");
-                            newContainingDiv.addClass("col-md-2 fore");
+                            newContainingDiv.addClass("col-md-2 fore ml-2 text-center");
                         var temperature = response.list[whatTime[i]].main.temp;
                         var temperatureDiv = $("<p>");
                         temperatureDiv.text(temperature + "°C");
