@@ -87,7 +87,18 @@
         $(".currentdate").text(date);
         $(".currentTime").text(currentDate);
         var userCity = "";
-        fetch('https://extreme-ip-lookup.com/json/')
+        var storedCity = localStorage.getItem('city');
+
+        if (storedCity) {
+            var stored = localStorage.getItem("city");
+            makingBtns(stored);
+            console.log(stored);
+            ajaxCall(stored);
+            forecastCall(stored);
+        }
+        else 
+        {
+            fetch('https://extreme-ip-lookup.com/json/')
             .then(res => res.json())
             .then(response => {
                 userCity = response.city;
@@ -97,6 +108,8 @@
             .catch((data, status) => {
                 console.log('Request failed');
             })
+        }
+        
 
 
         function makingBtns(x) {
@@ -107,6 +120,7 @@
             newCity.attr('id', x);
             newListItem.append(newCity);
             $(".cityList").append(newListItem);
+            localStorage.setItem("city", x);
         };
 
         function clear() {
