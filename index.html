@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Weather</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!-- Bootstrap File -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/style/style.css">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js">
+    </script>
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+        integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+        integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+        crossorigin="anonymous"></script>
+
+    <!-- JQuery -->
+    <script src="https://code.jquery.com/jquery.js"></script>
+
+    <script src="https://unpkg.com/moment"></script>
+</head>
+
+<body>
+    <div class="jumbotron jumbotron-fluid pinkbkg pt-0" style="height:100px">
+        <div class="container text-center pinkbkg pt-3 mt-0" style="height:100px">
+            <h1 class="display-8 pt-0">Weather Dashboard</h1>
+            <p class="currentTime text"></p>
+        </div>
+    </div>
+    <div class="container-fluid happyface">
+        <div class="row">
+
+
+            <div class="col-md-3 navigation">
+                <div class="form-group">
+                    <label for="exampleFormControlInput1"><i>Search for a City!</i></label>
+                    <input type="city" class="form-control" id="citySearch" placeholder="eg. Sydney">
+                    <button type="submit" class="btn btn-info mt-1" id="searchBtn">Search</button>
+                </div>
+                <ul class="cityList">
+
+                </ul>
+            </div>
+            <div class="col-md-9 forecastbox">
+                <div class="weatherresult">
+                    <div>
+                        <div class="header">
+                            <h1 class="city"></h1><img id="imageicon">
+                            <div class="error-messages" style="display:none;">
+                            <img src="assets/style/oops.png">
+                            </div>
+                            <p class="currentdate"></p>
+                        </div>
+                        <div class="image">
+                            <div class="info">
+                                <p class="temperature"></p>
+                                <p class="temperatureFeels"></p>
+                                <p class="humidity"></p>
+                                <p class="windspeed"></p>
+                                <p class="uvindex"></p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="row 5forecast">
+           <div class="col-md-1">
+
+           </div>     
+        </div>
+    </div>
+
+
+    <script>
+        var date = moment().format("dddd, MMMM Do YYYY");
+        var currentDate = moment().format("hh:mm a, dddd, MMMM Do YYYY")
+
+        $(".currentdate").text(date);
+        $(".currentTime").text(currentDate);
+        var userCity = "";
+        fetch('https://extreme-ip-lookup.com/json/')
+            .then(res => res.json())
+            .then(response => {
+                userCity = response.city;
+                ajaxCall(userCity);
+                forecastCall(userCity);
+            })
+            .catch((data, status) => {
+                console.log('Request failed');
+            })
+
+
+        function makingBtns(x) {
+            var newListItem = $("<li>");
+            var newCity = $("<button>");
+            newCity.addClass("btn-city");
+            newCity.text(x);
+            newCity.attr('id', x);
+            newListItem.append(newCity);
+            $(".cityList").append(newListItem);
+        };
+
+        function clear() {
+            $(".city").text("");
+                    $(".temperature").html("");
+                    $("#imageicon").attr("src", "");
+                    $(".temperatureFeels").html("");
+                    $(".humidity").html("");
+                    $(".windspeed").html("");
+                    $(".uvindex").html("");
+                    $(".currentdate").html("");
+                    $(".5forecast").html("");
+                    
+                    $(".error-messages").html("City not found! Please make sure you enter a valid city name.").fadeIn();
+        };
+
+        function UrlExists(url) 
+        {
+            var http = new XMLHttpRequest();
+            http.open('HEAD', url, false);
+            http.send();
+            if (http.status == 404) 
+            {
+                clear();
+               return;
+            }
+            else 
+            {
+                $(".error-messages").css("display", "none");
+                var margin= $("<div>");
+                    margin.addClass("col-md-1");
+                    $("5forecast").prepend(margin);
+                var str = url;
+                var arr=str.split("?q=");
+                var arr2= arr[1].split("&appid");
+                var searchTerm = arr2[0];
+                makingBtns(searchTerm);
+            }
+         };
+
+
+        function ajaxCall(citySearch) {
+            var queryURL = "https://api.openweathermap.org/data/2.5/weather?q=" + citySearch + "&appid=9edde4d3d50871b7d0d7074d24782ded";
+
+            $.ajax({
+                url: queryURL,
+                method: "GET"
+            })
+                .then(function (response) {
+                    var cityName = response.name;
+                    var weatherDescription = response.weather[0].description;
+                    var temperature = response.main.temp;
+                    var parseTemp = parseInt(temperature) - 273.15;
+                    var temperatureC = Math.round(parseTemp);
+                    var temperatureFeels = parseInt(response.main.feels_like) - 273.15;
+                    var temperatureFeelsC = Math.round(temperatureFeels);
+                    var humid = response.main.humidity;
+                    var windspeed = response.wind.speed;
+                    var uv = response.main.uv;
+                    var imageIndex = response.weather[0].icon;
+
+                    var imageUrl = "http://openweathermap.org/img/wn/" + imageIndex + "@2x.png";
+
+                    $(".city").text(cityName);
+                    $(".temperature").text("Temperature: " + temperatureC + "°C");
+                    $(".temperatureFeels").text("Feels Like: " + temperatureFeelsC + "°C");
+                    $(".humidity").text("Humidity: " + temperatureFeelsC + "%");
+                    $(".windspeed").text("Wind Speed: " + windspeed + "km/hr");
+                    $(".uvindex").text("UV Index: " + windspeed);
+
+                    $("#imageicon").attr("src", imageUrl);
+                })
+        }
+
+        function forecastCall(citySearch) {
+            var url = "https://api.openweathermap.org/data/2.5/forecast?q=" + citySearch + "&appid=9edde4d3d50871b7d0d7074d24782ded&cnt=40&units=metric";
+
+
+            $.ajax({
+                url: url,
+                method: "GET"
+            })
+                .then(function (response) {
+                    var whatTime = [0, 8, 16, 24, 32]
+
+                    for (i = 0; i < whatTime.length; i++) {
+                        var newContainingDiv = $("<div>");
+                            newContainingDiv.addClass("col-md-2 fore");
+                        var temperature = response.list[whatTime[i]].main.temp;
+                        var temperatureDiv = $("<p>");
+                        temperatureDiv.text(temperature + "°C");
+
+                        var imageIndex = response.list[whatTime[i]].weather[0].icon;
+                        var image = $("<img>");
+                        var imgUrl = "http://openweathermap.org/img/wn/" + imageIndex + "@2x.png";
+                        image.attr("src", imgUrl);
+
+                        var humidity = response.list[whatTime[i]].main.humidity;
+                        var humidityDiv = $("<p>");
+                        humidityDiv.text(humidity + "%");
+
+                        var date = response.list[whatTime[i]].dt_txt;
+                        var dateDiv = $("<h1>");
+                        dateDiv.text(date);
+
+                        newContainingDiv.append(date);
+                        newContainingDiv.append(image);
+                        newContainingDiv.append(temperatureDiv);
+                        newContainingDiv.append(humidityDiv);
+                        $(".5forecast").append(newContainingDiv);
+
+                    }
+                    
+                })
+        }
+
+
+        $("#searchBtn").on("click", function (event) {
+            event.preventDefault;
+            var searchTerm = $("#citySearch").val();
+            var urlExisting = "https://api.openweathermap.org/data/2.5/weather?q=" + searchTerm + "&appid=9edde4d3d50871b7d0d7074d24782ded";
+                UrlExists(urlExisting);
+
+            
+        });
+
+
+
+        $(".cityList").on("click", function (event) {
+            event.preventDefault;
+            var search = event.target.id;
+
+            ajaxCall(search);
+            forecastCall(search);
+
+        });
+
+
+
+    </script>
+
+
+</body>
+
+</html>

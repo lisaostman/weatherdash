@@ -1,0 +1,43 @@
+.pinkbkg {
+    background-color: rgb(156, 192, 216);
+    border-bottom: darkblue 1px solid;
+    text-shadow: 2px 2px #201d35;
+    color: rgb(136, 135, 221);
+}
+
+.forecastbox {
+    background-color: rgb(156, 192, 216);
+    margin: 10px 0px 10px 0px;
+    padding: 10px 10px 10px 10px;
+}
+
+.navigation {
+    border-right: darkblue 1px solid;
+    color: grey;
+}
+
+#searchBtn {
+    background-color: rgb(110, 146, 170);
+}
+
+.btn-city {
+    color: rgb(80, 35, 80);
+    border-radius: 4px;
+    background-color: rgb(175, 214, 240);
+}
+
+.fore {
+    border: rgb(19, 0, 16) 1px solid;
+    margin: 5px 0.5px 2px 0.5px;
+    border-radius: 4px;
+    background-color: rgb(172, 199, 218);
+    box-sizing: border-box;
+}
+
+.error-messages {
+    
+    background-color: rgb(255, 172, 190);
+    border: rgb(201, 37, 119) 1px solid;
+    padding: 5px 5px 5px 5px;
+    
+}
