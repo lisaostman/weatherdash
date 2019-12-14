@@ -97,6 +97,7 @@
                 .then(res => res.json())
                 .then(response => {
                     userCity = response.city;
+                    $(".error-messages").css("display", "none");
                     ajaxCall(userCity);
                     forecastCall(userCity);
                 })
@@ -136,6 +137,7 @@
             newListItem.append(newCity);
             $(".cityList").append(newListItem);
             localStorage.setItem("city", x);
+            $(".error-messages").css("display", "none");
         };
 
         function clear() {
@@ -175,6 +177,7 @@
 
 
         function ajaxCall(citySearch) {
+            
             var queryURL = "https://api.openweathermap.org/data/2.5/weather?q=" + citySearch + "&appid=9edde4d3d50871b7d0d7074d24782ded";
             var lat = "";
             var lon = "";
@@ -252,10 +255,13 @@
                         humidityDiv.text(humidity + "%");
 
                         var date = response.list[whatTime[i]].dt_txt;
-                        var dateDiv = $("<h1>");
-                        dateDiv.text(date);
+                        var dateSplit = date.split("06");
+                        var dateSplitDisplay = dateSplit[0];
+                        console.log(date);
+                        var dateDiv = $("<h6>");
+                        dateDiv.text(dateSplitDisplay);
 
-                        newContainingDiv.append(date);
+                        newContainingDiv.append(dateDiv);
                         newContainingDiv.append(image);
                         newContainingDiv.append(temperatureDiv);
                         newContainingDiv.append(humidityDiv);
@@ -280,6 +286,7 @@
 
         $(".cityList").on("click", function (event) {
             event.preventDefault;
+            $(".error-messages").css("display", "none");
             var search = event.target.id;
 
             ajaxCall(search);
