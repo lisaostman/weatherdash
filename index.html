@@ -45,7 +45,7 @@
                     <button type="submit" class="btn btn-info mt-1" id="searchBtn">Search</button>
                     <button class="btn btn-info btn-city mt-1 mb-1" id="userLocate">My Location</button>
                 </div>
-                
+
                 <ul class="cityList">
 
                 </ul>
@@ -56,7 +56,7 @@
                         <div class="header">
                             <h1 class="city"></h1><img id="imageicon">
                             <div class="error-messages" style="display:none;">
-                            <img src="assets/style/oops.png">
+                                <img src="assets/style/oops.png">
                             </div>
                             <p class="currentdate"></p>
                         </div>
@@ -76,9 +76,9 @@
 
         </div>
         <div class="row 5forecast">
-           <div class="col-md-1">
+            <div class="col-md-1">
 
-           </div>     
+            </div>
         </div>
     </div>
 
@@ -92,17 +92,17 @@
         var userCity = "";
         var storedCity = localStorage.getItem('city');
 
-        $("#userLocate").on("click", function() {
+        $("#userLocate").on("click", function () {
             fetch('https://extreme-ip-lookup.com/json/')
-            .then(res => res.json())
-            .then(response => {
-                userCity = response.city;
-                ajaxCall(userCity);
-                forecastCall(userCity);
-            })
-            .catch((data, status) => {
-                console.log('Request failed');
-            })
+                .then(res => res.json())
+                .then(response => {
+                    userCity = response.city;
+                    ajaxCall(userCity);
+                    forecastCall(userCity);
+                })
+                .catch((data, status) => {
+                    console.log('Request failed');
+                })
         })
 
         if (storedCity) {
@@ -112,20 +112,19 @@
             ajaxCall(stored);
             forecastCall(stored);
         }
-        else 
-        {
+        else {
             fetch('https://extreme-ip-lookup.com/json/')
-            .then(res => res.json())
-            .then(response => {
-                userCity = response.city;
-                ajaxCall(userCity);
-                forecastCall(userCity);
-            })
-            .catch((data, status) => {
-                console.log('Request failed');
-            })
+                .then(res => res.json())
+                .then(response => {
+                    userCity = response.city;
+                    ajaxCall(userCity);
+                    forecastCall(userCity);
+                })
+                .catch((data, status) => {
+                    console.log('Request failed');
+                })
         }
-        
+
 
 
         function makingBtns(x) {
@@ -141,51 +140,54 @@
 
         function clear() {
             $(".city").text("");
-                    $(".temperature").html("");
-                    $("#imageicon").attr("src", "");
-                    $(".temperatureFeels").html("");
-                    $(".humidity").html("");
-                    $(".windspeed").html("");
-                    $(".uvindex").html("");
-                    $(".currentdate").html("");
-                    $(".5forecast").html("");
-                    
-                    $(".error-messages").html("City not found! Please make sure you enter a valid city name.").fadeIn();
+            $(".temperature").html("");
+            $("#imageicon").attr("src", "");
+            $(".temperatureFeels").html("");
+            $(".humidity").html("");
+            $(".windspeed").html("");
+            $(".uvindex").html("");
+            $(".currentdate").html("");
+            $(".5forecast").html("");
+
+            $(".error-messages").html("City not found! Please make sure you enter a valid city name.").fadeIn();
         };
 
-        function UrlExists(url) 
-        {
+        function UrlExists(url) {
             var http = new XMLHttpRequest();
             http.open('HEAD', url, false);
             http.send();
-            if (http.status == 404) 
-            {
+            if (http.status == 404) {
                 clear();
-               return;
+                return;
             }
-            else 
-            {
+            else {
                 $(".error-messages").css("display", "none");
-                var margin= $("<div>");
-                    margin.addClass("col-md-1");
-                    $("5forecast").prepend(margin);
+                var margin = $("<div>");
+                margin.addClass("col-md-1");
+                $("5forecast").prepend(margin);
                 var str = url;
-                var arr=str.split("?q=");
-                var arr2= arr[1].split("&appid");
+                var arr = str.split("?q=");
+                var arr2 = arr[1].split("&appid");
                 var searchTerm = arr2[0];
                 makingBtns(searchTerm);
             }
-         };
+        };
 
 
         function ajaxCall(citySearch) {
             var queryURL = "https://api.openweathermap.org/data/2.5/weather?q=" + citySearch + "&appid=9edde4d3d50871b7d0d7074d24782ded";
+            var lat = "";
+            var lon = "";
+            var UVindex = "";
 
             $.ajax({
                 url: queryURL,
                 method: "GET"
             })
                 .then(function (response) {
+                    lat = response.coord.lat;
+                    lon = response.coord.lon;
+                    UVindex = "http://api.openweathermap.org/data/2.5/uvi?appid=9edde4d3d50871b7d0d7074d24782ded&lat=" + lat + "&lon=" + lon;
                     var cityName = response.name;
                     var weatherDescription = response.weather[0].description;
                     var temperature = response.main.temp;
@@ -195,7 +197,7 @@
                     var temperatureFeelsC = Math.round(temperatureFeels);
                     var humid = response.main.humidity;
                     var windspeed = response.wind.speed;
-                    var uv = response.main.uv;
+
                     var imageIndex = response.weather[0].icon;
 
                     var imageUrl = "http://openweathermap.org/img/wn/" + imageIndex + "@2x.png";
@@ -205,10 +207,20 @@
                     $(".temperatureFeels").text("Feels Like: " + temperatureFeelsC + "°C");
                     $(".humidity").text("Humidity: " + temperatureFeelsC + "%");
                     $(".windspeed").text("Wind Speed: " + windspeed + "km/hr");
-                    $(".uvindex").text("UV Index: " + windspeed);
+
 
                     $("#imageicon").attr("src", imageUrl);
+
+                    $.ajax({
+                        url: UVindex,
+                        method: "GET"
+                    })
+                        .then(function (response) {
+                            $(".uvindex").text("UV Index: " + response.value);
+                        })
                 })
+
+
         }
 
         function forecastCall(citySearch) {
@@ -223,9 +235,9 @@
                     var whatTime = [0, 8, 16, 24, 32]
                     $(".5forecast").html("");
                     for (i = 0; i < whatTime.length; i++) {
-                        
+
                         var newContainingDiv = $("<div>");
-                            newContainingDiv.addClass("col-md-2 fore ml-2 text-center");
+                        newContainingDiv.addClass("col-md-2 fore ml-2 text-center");
                         var temperature = response.list[whatTime[i]].main.temp;
                         var temperatureDiv = $("<p>");
                         temperatureDiv.text(temperature + "°C");
@@ -250,7 +262,7 @@
                         $(".5forecast").append(newContainingDiv);
 
                     }
-                    
+
                 })
         }
 
@@ -259,9 +271,9 @@
             event.preventDefault;
             var searchTerm = $("#citySearch").val();
             var urlExisting = "https://api.openweathermap.org/data/2.5/weather?q=" + searchTerm + "&appid=9edde4d3d50871b7d0d7074d24782ded";
-                UrlExists(urlExisting);
+            UrlExists(urlExisting);
 
-            
+
         });
 
 
